@@ -1,0 +1,101 @@
+/* 引入本地字体 */
+@font-face {
+    font-family: 'DIN-Bold';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./din/DIN-Black.otf");
+}
+@font-face {
+    font-family: 'DIN-Bold';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./din/DIN-Bold.otf");
+}
+@font-face {
+    font-family: 'DIN-Bold';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./din/DIN-Medium.otf");
+}
+@font-face {
+    font-family: 'DIN-Bold';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./din/DIN-Regular.otf");
+}
+
+/* https://www.googlefonts.cn/?selection.family=Roboto    font down */
+/* @import url('https://fonts.font.im/css?family=Roboto'); */
+
+/* @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Black.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-BlackItalic.ttf");
+} */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Bold.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-BoldItalic.ttf");
+}
+/* @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Italic.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Light.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-LightItalic.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Medium.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-MediumItalic.ttf");
+} */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Regular.ttf");
+}
+/* @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-Thin.ttf");
+}
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./roboto/Roboto-ThinItalic.ttf");
+} */

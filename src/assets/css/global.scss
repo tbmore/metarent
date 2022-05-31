@@ -1,0 +1,44 @@
+@import './_global_variables.scss';
+@import './mixin.scss';
+
+#nprogress .bar {
+    background: $primary-color  !important;
+}
+
+.text_align_right {
+    text-align: right;
+}
+
+.text_align_left {
+    text-align: left;
+}
+
+.w100 {
+    width: 100%;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.textr {
+    text-align: right;
+}
+
+.clearfix:after,
+.clearfix:before {
+    content: "";
+    display: table
+}
+
+.clearfix:after {
+    clear: both
+}
+
+.clearfix {
+    zoom: 1
+}
+
+.flex_dir_c {
+    flex-direction: column;
+}

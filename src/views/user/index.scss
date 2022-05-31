@@ -1,0 +1,46 @@
+@import "@/assets/css/global.scss";
+
+.user_input {
+    height: 52px;
+    border-radius: 12px;
+    padding: 14px 24px;
+}
+
+// ::v-deep.ant-input-lg {
+:deep(.ant-input-lg) {
+    // padding: 14px 24px;
+    font-size: 14px;
+}
+
+:deep(.ant-form-item-label) {
+    >label {
+        font-size: $font-size-18;
+        font-weight: bold;
+    }
+}
+
+:deep(.ant-form-vertical .ant-form-item-label, .ant-col-24.ant-form-item-label, .ant-col-xl-24.ant-form-item-label) {
+    padding-bottom: 12px;
+}
+
+:deep(.ant-form-item) {
+    margin-bottom: 18px;
+}
+
+:deep(.ant-form-item-with-help .ant-form-item-explain) {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+
+    .ant-form-item-explain-error {
+        padding: 14px 24px;
+    }
+}
+
+.submit {
+    width: 334px;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+}
