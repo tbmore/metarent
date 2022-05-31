@@ -30,8 +30,8 @@
           <a-row class="user_menu"
                  align="middle"
                  justify="center"
-                 v-if="routeItem.path=='/user/retrievepassword'&&routeItem.query">
-            <a-col class="user_menu_login">{{'retrieve password'}}</a-col>
+                 v-if="routeItem.path=='/user/retrievepassword'&&registerPage=='verify'">
+            <a-col class="user_menu_login">{{t('page.user.retrievepassword.title')}}</a-col>
           </a-row>
           <a-col span="8"
                  class="textr">
@@ -57,6 +57,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref, defineAsyncComponent } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+
 import { getRouteItem, RoutesDataItem, vueRoutes } from "@/utils/router";
 import UserLayoutRoutes from "@/router/UserLayoutRoutes";
 import useTitle from "@/composables/useTitle";
@@ -75,21 +77,27 @@ export default defineComponent({
   setup() {
     const { t } = useI18n();
     const route = useRoute();
+    const store = useStore();
     // 所有菜单路由
     const menuData = ref<RoutesDataItem[]>(
       vueRoutes(UserLayoutRoutes, "/user")
+    );
+
+    const registerPage = computed<"email" | "verify" | "username" | "password">(
+      () => store.state.user.registerPage
     );
 
     // 当前路由 item
     const routeItem = computed<RoutesDataItem>(() =>
       getRouteItem(route.path, menuData.value as RoutesDataItem[])
     );
-    console.log(menuData.value)
+    console.log(menuData.value);
     // 设置title
     useTitle(routeItem);
     return {
       t,
       routeItem,
+      registerPage,
     };
   },
 });

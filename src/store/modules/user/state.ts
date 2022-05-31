@@ -9,7 +9,8 @@ const state: StateType = {
     message: 0,
     loginStatus: undefined,
     errorMsg: undefined,
-    registerPage:'password', // 注册页面当前显示内容
+    registerPage:'email', // 注册页面当前显示内容
+    retrievePasswordPage:'email', // 忘记页面当前显示内容
 };
 
 export default state

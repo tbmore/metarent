@@ -5,11 +5,11 @@
             :wrapper-col="{span:24}"
             layout="vertical">
       <a-form-item :label="t('page.user.login.form.email.title')"
-                   v-bind="validateInfos.username">
-        <a-auto-complete :options="usernameoptions"
+                   v-bind="validateInfos.email">
+        <a-auto-complete :options="emailOptions"
                          @search="handleSearch"
                          @select="handleSelect">
-          <a-input v-model:value="modelRef.username"
+          <a-input v-model:value="modelRef.email"
                    :placeholder="t('page.user.login.form-item-email')"
                    size="large"
                    class="user_input"
@@ -27,10 +27,9 @@
       <a-form-item>
         <a-button type="primary"
                   class="submit user_input"
-                  @keyup.enter="handleSubmit('email',$event)"
-                  :loading="submitLoading"
+                  @click="handleSubmit('email',$event)"
                   size="large"
-                  :disabled="btnverifyStatus">
+                  :disabled="btnEmailStatus">
           {{t('page.user.register.password.btn')}}
         </a-button>
       </a-form-item>
@@ -82,9 +81,9 @@
     </a-row>
     <a-button type="primary"
               class="submit user_input"
-              @keyup.enter="handleSubmit('verify',$event)"
-              :loading="submitLoading"
-              size="large">
+              @click="handleSubmit('verify',$event)"
+              size="large"
+              :disabled="btnVerifyStatus">
       {{t('next.step')}}
     </a-button>
   </a-row>
@@ -115,7 +114,6 @@
     <a-button type="primary"
               class="submit user_input"
               @click="handleSubmit('username',$event)"
-              :loading="submitLoading"
               size="large"
               :disabled="btnUsernameStatus">
       {{t('page.user.register.username.btn')}}
@@ -148,7 +146,6 @@
     <a-button type="primary"
               class="submit user_input"
               @click="handleSubmit('password',$event)"
-              :loading="submitLoading"
               size="large"
               :disabled="btnPasswordStatus">
       {{t('page.user.register.password.btn')}}
@@ -186,22 +183,14 @@ import {
 
 import ALink from "@/components/ALink/index.vue";
 
-import loginLoading from "@/assets/images/user/login_loading.png";
-import loginFailed from "@/assets/images/user/login_failed.png";
-
 interface UserLoginSetupData {
   t: (key: string | number) => string;
   resetFields: (newValues?: Props) => void;
   validateInfos: ComputedRef<validateInfos>;
   modelRef: LoginParamsType;
-  submitLoading: Ref<boolean>;
   handleSubmit: (key: string, e: MouseEvent) => void;
   loginStatus: ComputedRef<"error" | "ok" | undefined>;
-  loginLoading: string;
-  loginFailed: string;
-  isLogin: Ref<boolean>;
-  isLoginError: Ref<boolean>;
-  usernameoptions: Ref<{ value: string }[]>;
+  emailOptions: Ref<{ value: string }[]>;
   handleSearch: (e: string) => void;
   handleSelect: (e: string) => void;
   registerPage: ComputedRef<"email" | "verify" | "username" | "password">;
@@ -211,7 +200,7 @@ interface UserLoginSetupData {
   backEvent: () => void;
   btnPasswordStatus: Ref<boolean>;
   btnUsernameStatus: Ref<boolean>;
-  btnverifyStatus: Ref<boolean>;
+  btnVerifyStatus: Ref<boolean>;
   setBtnStatus: (key: string) => void;
   validate: (key: string) => void;
   onFinish: () => void;
@@ -224,23 +213,21 @@ export default defineComponent({
     UnlockOutlined,
     ALink,
   },
-  setup(): UserLoginSetupData {
-    const isLogin = ref<boolean>(false);
-    const isLoginError = ref<boolean>(false);
+  setup() {
     const router = useRouter();
-    const { currentRoute } = router;
+    const { currentRoute, push } = router;
     const store = useStore<{ user: UserLoginStateType }>();
     const { t } = useI18n();
     const deadline = ref<number>(Date.now() + 1000 * 60);
 
+    const btnEmailStatus = ref<boolean>(true);
     const btnPasswordStatus = ref<boolean>(true);
     const btnUsernameStatus = ref<boolean>(true);
-    const btnverifyStatus = ref<boolean>(true);
+    const btnVerifyStatus = ref<boolean>(true);
 
     // 用户名自动填充
-    const usernameoptions = ref<{ value: string }[]>([]);
+    const emailOptions = ref<{ value: string }[]>([]);
     const handleSearch = async (val: string) => {
-      console.log(usernameoptions.value, val, "====");
       let res: { value: string }[];
       if (!val || val.indexOf("@") >= 0) {
         res = [];
@@ -249,11 +236,11 @@ export default defineComponent({
           value: `${val}@${domain}`,
         }));
       }
-      usernameoptions.value = res;
+      emailOptions.value = res;
     };
 
     const handleSelect = async (val: string) => {
-      modelRef.username = val;
+      modelRef.email = val;
       //   validate("username");
     };
 
@@ -267,16 +254,21 @@ export default defineComponent({
       //   }
     };
     const backEvent = () => {
-      console.log(registerPage);
-      switch (registerPage as any) {
+      console.log(registerPage.value);
+      switch (registerPage.value as any) {
+        case "email":
+          store.dispatch("user/setRegisterPage", "email");
+          //   push({ path: "register" });
+          break;
         case "verify":
-          store.dispatch("user/registerPage", "email");
+          store.dispatch("user/setRegisterPage", "email");
+          modelRef.email = "";
           break;
         case "username":
-          store.dispatch("user/registerPage", "verify");
+          store.dispatch("user/setRegisterPage", "verify");
           break;
         case "password":
-          store.dispatch("user/registerPage", "username");
+          store.dispatch("user/setRegisterPage", "username");
           break;
       }
     };
@@ -294,18 +286,16 @@ export default defineComponent({
     });
 
     // 表单验证
-    const validateUsername = async (_rule: Rule, value: string) => {
+    const validateEmail = async (_rule: Rule, value: string) => {
       if (value === "") {
         return Promise.reject("page.user.login.form-item-email.required");
       } else {
         const reg = new RegExp(
           /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/
         );
-        console.log(value, reg.test(value));
         if (!reg.test(value)) {
           return Promise.reject("page.user.login.form-item-email.required");
         }
-        console.log(123);
         return Promise.resolve();
       }
     };
@@ -322,12 +312,19 @@ export default defineComponent({
 
     //  表单验证规则
     const rulesRef = reactive({
-      username: [
+      email: [
         {
-          validator: validateUsername, // 自定义校验
+          validator: validateEmail, // 自定义校验
           trigger: "blur",
         },
       ],
+      username: [
+        {
+          validator: validateEmail, // 自定义校验
+          trigger: "blur",
+        },
+      ],
+
       password: [
         {
           validator: validatePassword, // 自定义校验
@@ -347,11 +344,12 @@ export default defineComponent({
       modelRef,
       rulesRef
     );
+    // 监听按键（输入键）状态
     const setBtnStatus = (key: string) => {
       const { email, username, password, verify } = modelRef;
       switch (key as any) {
         case "email":
-          btnUsernameStatus.value = email.length ? false : true;
+          btnEmailStatus.value = email.length ? false : true;
           break;
         case "username":
           btnUsernameStatus.value = username!.length ? false : true;
@@ -360,7 +358,7 @@ export default defineComponent({
           btnPasswordStatus.value = password.length ? false : true;
           break;
         case "verify":
-          btnverifyStatus.value = verify?.find((item) => !item) ? false : true;
+          btnVerifyStatus.value = verify?.find((item) => !item) ? false : true;
           break;
       }
     };
@@ -368,14 +366,30 @@ export default defineComponent({
       console.log("onFinish");
     };
     // 登录loading
-    const submitLoading = ref<boolean>(false);
     // 登录
     const handleSubmit = async (key: string, e: MouseEvent) => {
       e.preventDefault();
-      submitLoading.value = true;
+      const { email, username, password, verify } = modelRef;
+      const fieldsValue = await validate(key);
+      console.log(key);
+      switch (key as any) {
+        case "email":
+          store.dispatch("user/setRegisterPage", "verify");
+          break;
+        case "username":
+          store.dispatch("user/setRegisterPage", "email");
+          break;
+        case "password":
+          store.dispatch("user/setRegisterPage", "username");
+          break;
+        case "verify":
+          store.dispatch("user/setRegisterPage", "password");
+          break;
+      }
+
+      return;
       try {
         const fieldsValue = await validate<LoginParamsType>();
-        isLogin.value = true;
         console.log(fieldsValue);
         const res: boolean = await store.dispatch("user/login", fieldsValue);
         if (res === true) {
@@ -388,12 +402,9 @@ export default defineComponent({
             },
           });
         }
-        isLogin.value = false;
       } catch (error) {
         console.log("error", error);
-        isLogin.value = false;
       }
-      submitLoading.value = false;
     };
 
     // 登录状态
@@ -413,14 +424,9 @@ export default defineComponent({
       resetFields,
       validateInfos: validateInfosNew,
       modelRef,
-      submitLoading,
       handleSubmit,
       loginStatus,
-      loginLoading,
-      loginFailed,
-      isLogin,
-      isLoginError,
-      usernameoptions,
+      emailOptions,
       handleSearch,
       handleSelect,
       registerPage,
@@ -428,9 +434,10 @@ export default defineComponent({
       verifyInput,
       verifyKeydown,
       backEvent,
+      btnEmailStatus,
       btnPasswordStatus,
       btnUsernameStatus,
-      btnverifyStatus,
+      btnVerifyStatus,
       setBtnStatus,
       validate,
       onFinish,

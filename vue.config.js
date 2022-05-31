@@ -7,7 +7,7 @@ module.exports = defineConfig({
     transpileDependencies: true,
     publicPath: '/',
     outputDir: 'dist',
-    productionSourceMap: false,
+    productionSourceMap: NODE_ENV === 'development',
     lintOnSave: false, // 关闭eslist
     //配置入口文件和title
     pages: {

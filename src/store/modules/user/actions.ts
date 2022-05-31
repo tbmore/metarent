@@ -2,8 +2,8 @@ import { ResponseData } from '@/utils/request';
 import { queryCurrent, queryMessage } from "@/services";
 import { accountLogin, accountReg } from "@/services/user";
 import { removeToken, setToken } from "@/utils/localToken";
-import { LoginParamsType, RegisterParamsType } from "./user.d"
-const actions = {
+import { LoginParamsType, RegisterParamsType, StateType, ActionType } from "./user.d"
+const actions: ActionType = {
     async fetchCurrent({ commit }) {
         try {
             const response: ResponseData = await queryCurrent();
@@ -77,7 +77,16 @@ const actions = {
         } else {
             return false; // 自定义错误
         }
-    }
+    },
+    // 注册页面当前显示内容
+    async setRegisterPage({ commit }, payload: StateType) {
+        commit('setRegisterPage', payload);
+    },
+    // 忘记页面当前显示内容
+    async setRetrievePasswordPage({ commit }, payload: StateType) {
+        commit('setRetrievePasswordPage', payload);
+
+    },
 };
 
 export default actions

@@ -28,13 +28,13 @@ const routes: RoutesDataItem[] = [
         path: '/',
         component: SecurityLayout,
         children: [
-              {
+            {
                 title: 'empty',
                 path: '/',
                 redirect: settings.homeRouteItem.path,
                 component: IndexLayout,
                 children: IndexLayoutRoutes
-              },
+            },
             {
                 title: 'empty',
                 path: '/refresh',
@@ -42,13 +42,13 @@ const routes: RoutesDataItem[] = [
             },
         ]
     },
-      {
+    {
         title: 'empty',
         path: '/user',
         redirect: '/user/login',
         component: UserLayout,
         children: UserLayoutRoutes
-      },
+    },
     {
         // 将匹配以 `/user-` 开头的所有内容，并将其放在 `$route.params.afterUser` 下
         // { path: '/user-:afterUser(.*)', component: UserGeneric },

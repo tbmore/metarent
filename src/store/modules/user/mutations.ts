@@ -1,4 +1,5 @@
-const mutations = {
+import { StateType, ModuleType, MutationsType } from "./user.d"
+const mutations: MutationsType = {
     saveCurrentUser(state, payload) {
         state.currentUser = {
             ...state.currentUser,
@@ -14,9 +15,13 @@ const mutations = {
     changeErrorMsg(state, payload) {
         state.errorMsg = payload;
     },
-    // 
+    // 注册页面当前显示内容
     setRegisterPage(state, payload) {
         state.registerPage = payload;
+    },
+    // 忘记页面当前显示内容
+    setRetrievePasswordPage(state, payload) {
+        state.retrievePasswordPage = payload;
     },
 };
 

@@ -31,6 +31,7 @@ export default {
     'page.user.register.username.btn': 'complete registratio',
     'page.user.register.password.btn': 'Sign up now',
     'page.user.retrievepassword.password.tips': 'Please set a password with more than 8 characters that contains a combination of numbers, letters or symbols',
+    'page.user.retrievepassword.title': 'retrieve password',
 
 
 

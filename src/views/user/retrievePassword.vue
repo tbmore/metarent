@@ -2,12 +2,12 @@
   <a-row class="set_password flex_dir_c w100 h100"
          align="middle"
          justify="space-between"
-         v-if="currentStatus=='password'">
+         v-if="retrievePasswordPage=='password'">
     <a-form class="clearfix"
             :wrapper-col="{span:24}"
             layout="vertical">
       <a-row class="retrieve_titles w100"
-             justify="center">{{'retrieve password'}}</a-row>
+             justify="center">{{t('page.user.retrievepassword.title')}}</a-row>
       <a-form-item :label="t('page.user.login.form.password.title')"
                    v-bind="validateInfos.password">
         <a-input-password v-model:value="modelRef.password"
@@ -37,12 +37,12 @@
   <a-row class="main set_username flex_dir_c w100 h100"
          align="middle"
          justify="space-between"
-         v-if="currentStatus=='username'">
+         v-if="retrievePasswordPage=='email'">
     <a-form class="clearfix w100"
             :wrapper-col="{span:24}"
             layout="vertical">
       <a-row class="retrieve_titles w100"
-             justify="center">{{'retrieve password'}}</a-row>
+             justify="center">{{t('page.user.retrievepassword.title')}}</a-row>
       <a-form-item :label="t('page.user.login.form.username.title')"
                    v-bind="validateInfos.username">
         <a-auto-complete :options="usernameoptions"
@@ -75,7 +75,7 @@
   </a-row>
   <a-row class="verify flex_dir_c w100"
          justify="middle"
-         v-if="currentStatus=='verify'">
+         v-if="retrievePasswordPage=='verify'">
     <a-col class="verify_tips">We have sent a verification code to your email address <span>{{modelRef.username}}</span>, please check and enter the verification code in the input box below.</a-col>
     <a-col class="verify_code">Code</a-col>
     <a-form class="clearfix verify_form w100"
@@ -124,7 +124,7 @@
     </a-button>
   </a-row>
   <div class="back_btn"
-       v-if="currentStatus != 'email'"
+       v-if="retrievePasswordPage != 'email'"
        @click="backEvent"></div>
 </template>
 <script lang="ts">
@@ -173,7 +173,7 @@ interface UserLoginSetupData {
   usernameoptions: Ref<{ value: string }[]>;
   handleSearch: (e: string) => void;
   handleSelect: (e: string) => void;
-  currentStatus: ComputedRef<"email" | "verify" | "username" | "password">;
+  retrievePasswordPage: ComputedRef<"email" | "verify" | "password">;
   deadline: Ref<number>;
   verifyInput: (e: MouseEvent) => void;
   verifyKeydown: (e: MouseEvent) => void;
@@ -237,17 +237,17 @@ export default defineComponent({
       //   }
     };
     const backEvent = () => {
-      console.log(currentStatus.value);
-      switch (currentStatus.value) {
-        case "username":
-          store.dispatch("user/currentStatus", "verify");
+      console.log(retrievePasswordPage.value);
+      switch (retrievePasswordPage.value) {
+        case "email":
+          store.dispatch("user/retrievePasswordPage", "verify");
           break;
         case "password":
           push({ path: "/user/login" }); //push({ path: "./login" });
-          store.dispatch("user/currentStatus", "username");
+          store.dispatch("user/retrievePasswordPage", "username");
           break;
         case "verify":
-          store.dispatch("user/currentStatus", "email");
+          store.dispatch("user/retrievePasswordPage", "email");
           break;
       }
     };
@@ -340,16 +340,16 @@ export default defineComponent({
     const handleSubmit = async (key: string, e: MouseEvent) => {
       console.log(key, e, 99);
       e.preventDefault();
-      switch (currentStatus.value) {
-        case "username":
-          store.dispatch("user/currentStatus", "verify");
+      switch (retrievePasswordPage.value) {
+        case "email":
+          store.dispatch("user/retrievePasswordPage", "verify");
           break;
         case "password":
           push({ path: "/user/login" }); //push({ path: "./login" });
-          store.dispatch("user/currentStatus", "username");
+          store.dispatch("user/retrievePasswordPage", "username");
           break;
         case "verify":
-          store.dispatch("user/currentStatus", "email");
+          store.dispatch("user/retrievePasswordPage", "email");
           break;
       }
 
@@ -383,8 +383,8 @@ export default defineComponent({
       () => store.state.user.loginStatus
     );
 
-    const currentStatus = computed<"verify" | "username" | "password">(
-      () => "verify" || store.state.user.loginStatus
+    const retrievePasswordPage = computed<"verify" | "email" | "password">(
+      () => store.state.user.retrievePasswordPage
     );
 
     // 重置 validateInfos
@@ -405,7 +405,7 @@ export default defineComponent({
       usernameoptions,
       handleSearch,
       handleSelect,
-      currentStatus,
+      retrievePasswordPage,
       deadline,
       verifyInput,
       verifyKeydown,
