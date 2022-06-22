@@ -1,7 +1,7 @@
 import { StateType } from "./user.d"
 const state: StateType = {
     currentUser: {
-        id: 0,
+        id: 1,
         name: '',
         avatar: '',
         roles: [],

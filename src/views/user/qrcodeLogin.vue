@@ -15,6 +15,7 @@
       <a-row v-if="loginStatus==1"
              align="center">
         <iconpark-icon class="qrcode_scan_icon"
+                       size="24"
                        name="scan-code"></iconpark-icon>Open the&nbsp;<a-link to="https://www.imetalk.net/">MetaRent mobile APP</a-link>&nbsp; to scan the code to log in
       </a-row>
       <a-col v-else-if="loginStatus==2">{{t('page.user.qrcodeLogin.scan.failed')}}</a-col>
@@ -173,7 +174,6 @@ export default defineComponent({
         console.log(fieldsValue);
         const res: boolean = await store.dispatch("user/login", fieldsValue);
         if (res === true) {
-          message.success(t("page.user.login.form.login-success"));
           const { redirect, ...query } = currentRoute.value.query;
           router.replace({
             path: (redirect as string) || "/",
@@ -245,12 +245,11 @@ export default defineComponent({
   margin-bottom: 46px;
   line-height: 24px;
   .qrcode_scan_icon {
-    font-size: 24px;
     margin-right: 14px;
   }
 }
 .qrcode_info {
   color: $font-color-nomal;
-  font-size: $font-size-12;
+  font-size: 12px;
 }
 </style>

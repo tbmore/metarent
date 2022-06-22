@@ -6,6 +6,9 @@ const UserLayoutRoutes: RoutesDataItem[] = [
         title: 'user-layout.menu.login',
         path: 'login',
         component: () => import('@/views/user/login.vue'),
+        meta: {
+            isBack: true,
+        }
     },
     {
         // 注册

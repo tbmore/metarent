@@ -40,7 +40,7 @@ export default defineComponent({
 
     onMounted(() => {
       setHtmlLang(locale.value);
-    //   getFont();
+      //   getFont();
     });
 
     return {
@@ -53,6 +53,10 @@ export default defineComponent({
 
 <style lang="scss">
 @import "@/assets/css/global.scss";
+html,
+body {
+  @include scrollbar($background-color-minor);
+}
 #app {
   font-family: $font-family;
   -webkit-font-smoothing: antialiased;
@@ -60,6 +64,8 @@ export default defineComponent({
   text-align: center;
   color: $font-color-main;
   min-width: $default-width;
+  max-width: 1920px;
+  min-height: 100%;
   position: relative;
   font-size: $font-size-base;
 }

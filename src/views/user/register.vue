@@ -13,7 +13,7 @@
                    :placeholder="t('page.user.login.form-item-email')"
                    size="large"
                    class="user_input"
-                   @blur="validate('email')"
+                   @blur="inputBlur"
                    @keyup.enter="handleSubmit('email',$event)"
                    @change="setBtnStatus('email')">
           </a-input>
@@ -58,9 +58,9 @@
                        :maxlength="1"
                        min="0"
                        max="9"
-                       :ref="`verify${i}`"
-                       @keydown="verifyKeydown"
-                       @keyup="verifyInput">
+                       :ref="`verify${idx}`"
+                       @keydown="verifyKeydown(idx,$event)"
+                       @keyup="verifyInput(idx,$event)">
               </a-input>
             </a-form-item>
           </a-col>
@@ -70,6 +70,7 @@
     <a-row class="text_align_left resend_code"
            align="middle">
       <iconpark-icon class="user_ohter_login_item"
+                     size="24"
                      name="check-one-5ceo7la5"></iconpark-icon>Resend Code
       <a-statistic-countdown :value="deadline"
                              format="s"
@@ -101,13 +102,15 @@
                  :placeholder="t('page.user.register.username.lastname')"
                  size="large"
                  class="user_input"
-                 @keyup.enter="handleSubmit('username',$event)">
+                 @keyup.enter="handleSubmit('username',$event)"
+                 @change="setBtnStatus('username')">
         </a-input>
-        <a-input v-model:value="modelRef.username"
+        <a-input v-model:value="modelRef.firstName"
                  :placeholder="t('page.user.register.username.name')"
                  size="large"
                  class="user_input"
-                 @keyup.enter="handleSubmit('username',$event)">
+                 @keyup.enter="handleSubmit('username',$event)"
+                 @change="setBtnStatus('username')">
         </a-input>
       </a-form-item>
     </a-form>
@@ -182,6 +185,8 @@ import {
 } from "@/store/modules/user/user.d";
 
 import ALink from "@/components/ALink/index.vue";
+import { email } from "@/config/data";
+import { focus } from "@/directives/index";
 
 interface UserLoginSetupData {
   t: (key: string | number) => string;
@@ -207,11 +212,14 @@ interface UserLoginSetupData {
 }
 
 export default defineComponent({
-  name: "UserLogin",
+  name: "UserRegister",
   components: {
     UserOutlined,
     UnlockOutlined,
     ALink,
+  },
+  directives: {
+    focus,
   },
   setup() {
     const router = useRouter();
@@ -224,6 +232,12 @@ export default defineComponent({
     const btnPasswordStatus = ref<boolean>(true);
     const btnUsernameStatus = ref<boolean>(true);
     const btnVerifyStatus = ref<boolean>(true);
+    // ref({}) as Ref<Map>
+    const verify0: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify1: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify2: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify3: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const evidence = ref("");
 
     // 用户名自动填充
     const emailOptions = ref<{ value: string }[]>([]);
@@ -232,7 +246,7 @@ export default defineComponent({
       if (!val || val.indexOf("@") >= 0) {
         res = [];
       } else {
-        res = ["gmail.com", "163.com", "qq.com"].map((domain) => ({
+        res = email.map((domain) => ({
           value: `${val}@${domain}`,
         }));
       }
@@ -241,24 +255,43 @@ export default defineComponent({
 
     const handleSelect = async (val: string) => {
       modelRef.email = val;
+      validate("email").catch((err) => {
+        btnEmailStatus.value = err.errorFields.length ? true : false;
+      });
       //   validate("username");
     };
 
-    const verifyKeydown = (event) => {
-      //   console.log(event, "====");
-      //   const value = event.key
-      //   console.log(value)
-      //   if(!/[0-9]/.test(value)){
-      //     //   event.stopPropagation()
-      //     //   event.preventDefault()
-      //   }
+    const verifyKeydown = (idx: string | number, event) => {
+      const value = event.key,
+        keyCode = event.keyCode;
+      if (
+        !/[0-9]/.test(value) &&
+        keyCode != 13 &&
+        keyCode != 8 &&
+        keyCode != 46
+      ) {
+        event.preventDefault();
+      }
     };
+    const verifyInput = (idx: number, event: { key: any }) => {
+      const value = event.key;
+      if (/[0-9]/.test(value)) {
+        // console.log(verify1.value?.[0].value, verify1);
+        // verify3.value?.[0].focus()
+        const arr = [verify0, verify1, verify2, verify3];
+        if (idx < 3) {
+          arr[idx + 1].value?.[0].focus();
+        }
+      }
+      btnVerifyStatus.value =
+        modelRef.verify?.find((v) => v == "") == undefined ? false : true;
+    };
+
     const backEvent = () => {
       console.log(registerPage.value);
       switch (registerPage.value as any) {
         case "email":
-          store.dispatch("user/setRegisterPage", "email");
-          //   push({ path: "register" });
+        //   store.dispatch("user/setRegisterPage", "email");
           break;
         case "verify":
           store.dispatch("user/setRegisterPage", "email");
@@ -272,17 +305,14 @@ export default defineComponent({
           break;
       }
     };
-    const verifyInput = (event) => {
-      console.log(event);
-      console.log(modelRef.verify, "verify");
-    };
 
     // 表单值
-    const modelRef = reactive<LoginParamsType>({
+    const modelRef = reactive({
       email: "",
       username: "",
+      firstName: "",
       password: "",
-      verify: [],
+      verify: ["", "", "", ""],
     });
 
     // 表单验证
@@ -310,6 +340,28 @@ export default defineComponent({
       }
     };
 
+    const validateVerify = async (_rule: Rule, value: any) => {
+      const res: any = await store.dispatch("user/verifyToken", {
+        email: modelRef.email,
+        code: value.join(""),
+        type: "2",
+      });
+      if (res && res.code == 0) {
+        evidence.value = res.data;
+        return Promise.resolve();
+      } else {
+        return Promise.reject();
+      }
+    };
+
+    const validateUsername = async (_rule: Rule, value: string) => {
+      if (value === "") {
+        return Promise.reject("page.user.register.username.name");
+      } else {
+        return Promise.resolve();
+      }
+    };
+
     //  表单验证规则
     const rulesRef = reactive({
       email: [
@@ -320,7 +372,13 @@ export default defineComponent({
       ],
       username: [
         {
-          validator: validateEmail, // 自定义校验
+          validator: validateUsername, // 自定义校验
+          trigger: "blur",
+        },
+      ],
+      firstName: [
+        {
+          validator: validateUsername, // 自定义校验
           trigger: "blur",
         },
       ],
@@ -333,7 +391,7 @@ export default defineComponent({
       ],
       verify: [
         {
-          message: "",
+          validator: validateVerify,
           trigger: "blur",
         },
       ],
@@ -345,20 +403,23 @@ export default defineComponent({
       rulesRef
     );
     // 监听按键（输入键）状态
-    const setBtnStatus = (key: string) => {
-      const { email, username, password, verify } = modelRef;
+    const setBtnStatus = async (key: string) => {
+      const { email, username, firstName, password, verify } = modelRef;
       switch (key as any) {
         case "email":
-          btnEmailStatus.value = email.length ? false : true;
+          validate("email").catch((err) => {
+            btnEmailStatus.value = err.errorFields.length ? true : false;
+          });
           break;
         case "username":
-          btnUsernameStatus.value = username!.length ? false : true;
+          btnUsernameStatus.value =
+            username.length && firstName.length ? false : true;
           break;
         case "password":
           btnPasswordStatus.value = password.length ? false : true;
           break;
         case "verify":
-          btnVerifyStatus.value = verify?.find((item) => !item) ? false : true;
+          btnVerifyStatus.value = verify?.find((item) => !item) ? true : false;
           break;
       }
     };
@@ -369,41 +430,51 @@ export default defineComponent({
     // 登录
     const handleSubmit = async (key: string, e: MouseEvent) => {
       e.preventDefault();
-      const { email, username, password, verify } = modelRef;
+      const { email, username, firstName, password, verify } = modelRef;
       const fieldsValue = await validate(key);
-      console.log(key);
+      console.log(key, fieldsValue);
       switch (key as any) {
         case "email":
-          store.dispatch("user/setRegisterPage", "verify");
+          const _check = await inputBlur();
+          if (_check) {
+            const res: any = await store.dispatch("user/sendEmail", {
+              email: fieldsValue.email,
+              type: "2",
+            });
+            store.dispatch("user/setRegisterPage", "verify");
+          }
           break;
         case "username":
-          store.dispatch("user/setRegisterPage", "email");
+          if (fieldsValue) {
+            const res: any = await store.dispatch("user/register", {
+              email: email,
+              evidence: evidence.value,
+              firstName: firstName,
+              lastName: username,
+              password: password,
+            });
+            if (res && res.code == 0) {
+            //   const { redirect, ...query } = currentRoute.value.query;
+              router.replace({
+                path: '/overview',
+                // query: {
+                //   ...query,
+                // },
+              });
+            }
+          }
           break;
         case "password":
-          store.dispatch("user/setRegisterPage", "username");
+          if (fieldsValue) {
+            store.dispatch("user/setRegisterPage", "username");
+          }
+
           break;
         case "verify":
-          store.dispatch("user/setRegisterPage", "password");
+          if (fieldsValue) {
+            store.dispatch("user/setRegisterPage", "password");
+          }
           break;
-      }
-
-      return;
-      try {
-        const fieldsValue = await validate<LoginParamsType>();
-        console.log(fieldsValue);
-        const res: boolean = await store.dispatch("user/login", fieldsValue);
-        if (res === true) {
-          message.success(t("page.user.login.form.login-success"));
-          const { redirect, ...query } = currentRoute.value.query;
-          router.replace({
-            path: (redirect as string) || "/",
-            query: {
-              ...query,
-            },
-          });
-        }
-      } catch (error) {
-        console.log("error", error);
       }
     };
 
@@ -419,6 +490,31 @@ export default defineComponent({
     // 重置 validateInfos
     const validateInfosNew = useI18nAntdFormVaildateInfos(validateInfos);
 
+    const inputBlur = () => {
+      return new Promise((resolve, reject) => {
+        validate("email")
+          .then(async (fieldsValue) => {
+            btnEmailStatus.value = false;
+            const res: any = await store.dispatch("user/checkEmail", {
+              email: fieldsValue.email,
+            });
+            if (res) {
+              if (res.data == false) {
+                resolve(res);
+              } else {
+                // validate("email")
+                // validateField('email','abc')
+                console.error("邮箱已存在");
+              }
+            } else {
+              reject();
+            }
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    };
     return {
       t,
       resetFields,
@@ -441,6 +537,11 @@ export default defineComponent({
       setBtnStatus,
       validate,
       onFinish,
+      inputBlur,
+      verify0,
+      verify1,
+      verify2,
+      verify3,
     };
   },
 });
@@ -459,7 +560,7 @@ export default defineComponent({
   margin-top: 44px;
   text-align: left;
   line-height: 18px;
-  font-size: $font-size-12;
+  font-size: 12px;
   color: $font-color-nomal;
 }
 .verify {
@@ -505,21 +606,20 @@ export default defineComponent({
     }
   }
   .resend_code {
-    font-size: $font-size-16;
+    font-size: 16px;
     color: $font-color-nomal;
     line-height: 1.5;
     margin-top: 6px;
     :deep(.ant-statistic-content) {
-      font-size: $font-size-16;
+      font-size: 16px;
       line-height: 1;
       padding-left: 10px;
       color: $font-color-nomal;
     }
     :deep(.ant-statistic-content-value) {
-      font-size: $font-size-16;
+      font-size: 16px;
     }
     .user_ohter_login_item {
-      font-size: 24px;
       margin-left: 12px;
       margin-right: 5px;
     }

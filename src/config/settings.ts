@@ -74,9 +74,9 @@ const settings: SettingsType = {
     siteTitle: 'MetaRent',
     homeRouteItem: {
         icon: 'control',
-        title: 'index-layout.menu.home.workplace',
-        path: '/home',
-        component: ()=> import('@/views/home/index.vue')
+        title: 'index-layout.topmenu.menu.overview',
+        path: '/overview',
+        component: ()=> import('@/views/overview/index.vue')
     },
     siteTokenKey: 'MetaRent_token',
     ajaxHeadersTokenKey: 'x-token',

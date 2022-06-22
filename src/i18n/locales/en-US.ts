@@ -1,7 +1,9 @@
 export default {
     'empty': 'empty',
     'Not Found': 'Not Found',
-    'ok': 'ok',
+    'ok': 'OK',
+    'cancel': 'Cancel',
+    'reset': 'Reset',
     'next.step': 'Next step',
 
 
@@ -9,7 +11,7 @@ export default {
     'user-layout.menu.register': 'Register',
     'user-layout.menu.qrcode': 'Qrcode Login',
 
-      // user
+    // user
     'page.user.login.form.email.title': 'Login Account',
     'page.user.login.form.password.title': 'Password',
     'page.user.login.form.forgotpassword': 'Forgot Password',
@@ -32,9 +34,33 @@ export default {
     'page.user.register.password.btn': 'Sign up now',
     'page.user.retrievepassword.password.tips': 'Please set a password with more than 8 characters that contains a combination of numbers, letters or symbols',
     'page.user.retrievepassword.title': 'retrieve password',
+    'page.user.retrievepassword.email':'Please enter your registered email',
 
 
+    "index-layout.topmenu.menu.overview": "Overview",
+    "index-layout.topmenu.menu.listings": "Listings",
+    "index-layout.topmenu.menu.reservations": "Reservations",
+    "index-layout.topmenu.menu.co-hosts": "Co-Hosts",
+    "index-layout.topmenu.menu.housekeeper": "Housekeeper",
 
+    // listings
+    'page.listings.icon.name.BEDROOMS': 'BEDROOMS',
+    'page.listings.icon.name.BEDS': 'BEDS',
+    'page.listings.icon.name.BATHS': 'BATHS',
+    'page.listings.listings.null': 'Please fill in the info and publish your listing first',
+    'page.listings.search.null': 'No matching listing',
+
+    // listings hedders
+    'page.listings.listingsheader.name': 'Listing List',
+    'page.listings.listingsheader.describe': 'You will be listing and delisting managed properties on this page',
+    'page.listings.listingsheader.listing':'Listing',
+
+    // listings left
+    'page.listings.listingsleft.remove.title':'important hint',
+    'page.listings.listingsleft.remove.content':'Are you sure you want to take down your online listing? After the listing is removed, it will not be displayed in the user search results.',
+
+    // btn
+    'page.listings.btn.createlisting': 'Create listing',
 
 
 

@@ -6,6 +6,8 @@
   title: string;
   // 路由地址或外链
   path: string;
+  // 不使用locales
+  noLocales?:boolean;
 }
 
 /**

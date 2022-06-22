@@ -45,7 +45,7 @@ export interface LoginParamsType {
     email: string;
     password: string;
     username?: string;
-    verify?: number[];
+    verify?: [string,string,string,string];
 }
 
 export interface RegisterParamsType {

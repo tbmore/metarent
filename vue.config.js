@@ -31,8 +31,40 @@ module.exports = defineConfig({
         // 输出文件名会被推导为 `subpage.html`。
         // subpage: 'src/subpage/main.js'
     },
+
+    // devServer: {
+    //     // open: true,
+    //     // host: '0.0.0.0',
+    //     port: VUE_APP_PORT || 5280,
+    //     https: false,
+    //     // http 代理配置
+    //     proxy: {
+    //         '/user': {
+    //             target: 'http://192.168.0.194:8080',
+    //             changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+    //             pathRewrite: { // 在发出请求后将/coin-exchange替换为''空值，这样不影响接口请求
+    //                 '^/user': '/user'
+    //             }
+    //         },
+    //         '/house': {
+    //             target: 'http://192.168.0.194:8080',
+    //             changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+    //             pathRewrite: { // 在发出请求后将/coin-exchange替换为''空值，这样不影响接口请求
+    //                 '^/house': '/house'
+    //             }
+    //         },
+    //         //   '/api': {
+    //         //     target: 'http://wallet-help-api-dev',
+    //         //     changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+    //         //     pathRewrite: { // 在发出请求后将/coin-exchange替换为''空值，这样不影响接口请求
+    //         //       '^/api': '/api'
+    //         //     }
+    //         //   }
+    //     },
+    // },
+
     devServer: {
-        port: VUE_APP_PORT || 9000,
+        port: VUE_APP_PORT || 5280,
         // 配置反向代理
         /*
         proxy: {
@@ -46,6 +78,19 @@ module.exports = defineConfig({
             }
         },
         */
+        // setupMiddlewares: function (middlewares, devServer) {
+        //     if (NODE_ENV === 'development' && VUE_APP_MOCK === 'true') {
+        //         // parse app.body
+        //         // https://webpack.docschina.org/configuration/dev-server#devserversetupmiddlewares
+        //         // create application/json parser
+        //         devServer.app.use(bodyParser.json());
+        //         // create application/x-www-form-urlencoded parser
+        //         devServer.app.use(bodyParser.urlencoded({ extended: false }));
+        //         mockServer(devServer.app);
+        //         return middlewares
+        //     }
+        // }
+        // mock 配置
         // setupMiddlewares: function (middlewares, devServer) {
         //     if (NODE_ENV === 'development' && VUE_APP_MOCK === 'true') {
         //         // parse app.body

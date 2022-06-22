@@ -16,6 +16,11 @@ import SecurityLayout from '../layouts/SecurityLayout.vue';
 import IndexLayout from '../layouts/IndexLayout/index.vue';
 import IndexLayoutRoutes from './HomeLayoutRoutes';
 
+/* UploadLayout 上传房源布局 */
+import UploadLayout from '../layouts/UploadLayout/index.vue';
+import UploadLayoutRoutes from './UploadLayoutRoutes';
+import BlankLayout from '@/layouts/BlankLayout.vue';
+
 // 用户
 import UserLayout from '../layouts/UserLayout/index.vue';
 import UserLayoutRoutes from './UserLayoutRoutes';
@@ -37,6 +42,13 @@ const routes: RoutesDataItem[] = [
             },
             {
                 title: 'empty',
+                path: '/uploadListing',
+                redirect: '/uploadListing/unfinishedListing',
+                component: UploadLayout,
+                children: UploadLayoutRoutes
+            },
+            {
+                title: 'empty',
                 path: '/refresh',
                 component: () => import('@/views/refresh/index.vue'),
             },
@@ -44,8 +56,8 @@ const routes: RoutesDataItem[] = [
     },
     {
         title: 'empty',
-        path: '/user',
-        redirect: '/user/login',
+        path: '/empty',
+        redirect: '/empty/login',
         component: UserLayout,
         children: UserLayoutRoutes
     },
@@ -64,6 +76,7 @@ const router = createRouter({
         return { top: 0 }
     },
     history: NODE_ENV === 'development' ? createWebHistory(BASE_URL) : createWebHashHistory(BASE_URL),
+    // history: createWebHashHistory(BASE_URL),
     routes: routes,
 });
 

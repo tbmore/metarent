@@ -40,14 +40,27 @@
                     v-if="routeItem.path!=='/user/qrcode'" />
             <a-col to="/user/qrcode"
                    class="user_qrcode user_qrcode_account"
-                   @click="$router.go(-1)"
+                   @click="$router.back()"
                    v-else></a-col>
 
           </a-col>
 
         </a-row>
         <a-row class="w100 h100">
-          <router-view></router-view>
+          <!-- 后退缓存组件 -->
+          <router-view v-slot="{ Component,route }">
+            <!-- <keep-alive :include="['UserLogin']" :max="10">
+              <component :is="Component"
+                         :key="route.meta.isBack ? route.path : undefined"></component>
+            </keep-alive> -->
+            <keep-alive :include="['UserLogin']" :max="10">
+              <component :is="Component"
+                         v-if="route.meta.keepAlive"
+                         :key="route.meta.keepAliveKey" />
+            </keep-alive>
+            <component :is="Component"
+                       v-if="!route.meta.keepAlive" />
+          </router-view>
         </a-row>
       </a-row>
 
@@ -55,7 +68,12 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref, defineAsyncComponent } from "vue";
+import {
+  computed,
+  defineComponent,
+  ref,
+  watch,
+} from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -91,7 +109,10 @@ export default defineComponent({
     const routeItem = computed<RoutesDataItem>(() =>
       getRouteItem(route.path, menuData.value as RoutesDataItem[])
     );
-    console.log(menuData.value);
+    // console.log(routeItem.value);
+    watch(route, (val) => {
+      console.log(val.meta.isBack, 112);
+    });
     // 设置title
     useTitle(routeItem);
     return {
@@ -161,14 +182,14 @@ export default defineComponent({
         height: 100%;
         padding-top: 36px;
         box-sizing: border-box;
-        font-size: $font-size-22;
+        font-size: 22px;
         a {
           color: $font-color-minor;
         }
       }
       .isCurrent {
         a {
-          color: #003669;
+          color: $font-color-main;
           font-weight: bolder;
         }
         ::after {

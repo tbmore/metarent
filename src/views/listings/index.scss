@@ -1,0 +1,125 @@
+@import "@/assets/css/global.scss";
+
+:deep(.ant-tag) {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin: 0;
+}
+
+.detailed_default {
+    padding-bottom: 50px;
+    text-align: left;
+    max-height: calc(100vh - 133px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding-right: 16px;
+
+    .item_title {
+        font: 14px/16px "Roboto-Regular", Roboto;
+        color: $font-color-minor;
+        margin-bottom: 8px;
+    }
+
+    .item_content {
+        font: 500 16px/24px "Roboto-Medium", Roboto;
+        font-weight: 500;
+        color: $font-color-main;
+        box-sizing: border-box;
+        margin-bottom: 8px;
+
+        &[contenteditable="true"] {
+            padding: 10px;
+            border: 1px solid $background-color-minor;
+            border-radius: 8px;
+            overflow: hidden;
+            outline-color: $font-color-minor;
+        }
+
+        &:last-child {
+            margin-bottom: 0px;
+        }
+    }
+
+    :deep(.ant-card-head) {
+        min-height: auto;
+        border: none;
+        padding: 0 2px 0 6px;
+
+        .ant-card-head-wrapper {
+            height: 56px;
+        }
+
+        .ant-card-head-title,
+        .ant-card-extra {
+            padding: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: $font-color-main;
+            line-height: 24px;
+        }
+    }
+
+    :deep(.ant-card-body) {
+        border-radius: 12px;
+        border: 1px solid $background-color-minor;
+        overflow: hidden;
+        padding: 18px 26px;
+        position: relative;
+    }
+
+    .edit_btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        :deep(.ant-space-item) {
+            .ant-tag {
+                font: 14px/36px "Roboto-Regular", Roboto;
+                color: $font-color-minor;
+                border: none;
+                border-radius: initial;
+                border-bottom-left-radius: 12px;
+                background-color: #e8ebff;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            &:last-child {
+                .ant-tag {
+                    font: bold 14px/36px "Roboto-Bold", Roboto;
+                    color: #0084ff;
+                    border-radius: initial;
+                    border-top-right-radius: 12px;
+                }
+            }
+        }
+    }
+}
+
+.upload {
+    .save_and_help {
+        position: absolute;
+        right: 34px;
+        top: 39px;
+        z-index: 1;
+
+        .help {
+            width: 32px;
+            margin-right: 12px;
+            background-color: rgba($color: $background-color-minor, $alpha: 0.5);
+            cursor: pointer;
+        }
+
+        .quit {
+            background-color: rgba($color: $background-color-minor, $alpha: 0.5);
+            height: 32px;
+            border: none;
+            cursor: pointer;
+            font: 500 14px/20px "Roboto-Medium", Roboto;
+            padding: 0 14px;
+        }
+    }
+}

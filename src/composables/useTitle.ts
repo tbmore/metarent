@@ -8,17 +8,18 @@ import settings from '@/config/settings';
 import { RoutesDataItem } from '@/utils/router';
 
 export default function useTitle(route: ComputedRef<RoutesDataItem> | Ref<RoutesDataItem>): void {
-    const{ t } = useI18n();
+    const { t } = useI18n();
 
     const setTitle = (title: string): void => {
+        if (!title || title == 'empty') return
         document.title = `${t(title)} - ${settings.siteTitle}`;
-    } 
+    }
 
-    watch<RoutesDataItem, false>(route,() => {
+    watch<RoutesDataItem, false>(route, () => {
         setTitle(route.value.title || '');
     })
 
-    onMounted(()=> {
+    onMounted(() => {
         setTitle(route.value.title);
     })
 

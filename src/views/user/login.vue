@@ -7,6 +7,8 @@
       <a-form-item :label="t('page.user.login.form.email.title')"
                    v-bind="validateInfos.email">
         <a-auto-complete :options="emailOptions"
+                         autofocus
+                         backfill
                          @search="handleSearch"
                          @select="handleSelect">
           <a-input v-model:value="modelRef.email"
@@ -32,6 +34,7 @@
                           class="user_input"
                           @keyup.enter="handleSubmit"
                           :maxlength="50"
+                          @blur="validate('password')"
                           @change="setBtnStatus('password')">
         </a-input-password>
       </a-form-item>
@@ -45,8 +48,8 @@
                   class="submit user_input"
                   @click="handleSubmit"
                   :loading="submitLoading"
-                  :disabled="btnStatus"
                   size="large">
+          <!-- :disabled="btnStatus" -->
           {{t('user-layout.menu.login')}}
         </a-button>
       </a-form-item>
@@ -57,10 +60,13 @@
            justify="middle">
       <a-col>{{t('page.user.login.form.otherlogin')}}</a-col>
       <iconpark-icon class="user_ohter_login_item"
+                     size="24"
                      name="apple"></iconpark-icon>
       <iconpark-icon class="user_ohter_login_item"
+                     size="24"
                      name="guge"></iconpark-icon>
       <iconpark-icon class="user_ohter_login_item"
+                     size="24"
                      name="tuite"></iconpark-icon>
     </a-row>
 
@@ -121,6 +127,7 @@ import {
 
 import loginLoading from "@/assets/images/user/login_loading.png";
 import loginFailed from "@/assets/images/user/login_failed.png";
+import { email } from "@/config/data";
 
 interface UserLoginSetupData {
   t: (key: string | number) => string;
@@ -160,7 +167,8 @@ export default defineComponent({
       if (!val || val.indexOf("@") >= 0) {
         res = [];
       } else {
-        res = ["gmail.com", "163.com", "qq.com"].map((domain) => ({
+        // Gmail、outlook、protonmail、GMX、Mail.com、Fastmail、Yahoo Mail、AOL Mail、iCloud
+        res = email.map((domain) => ({
           value: `${val}@${domain}`,
         }));
       }
@@ -174,8 +182,8 @@ export default defineComponent({
 
     // 表单值
     const modelRef = reactive<LoginParamsType>({
-      email: "",
-      password: "",
+      email: "test@gmail.com",
+      password: "88888888",
     });
 
     // 表单验证
@@ -242,8 +250,8 @@ export default defineComponent({
         const fieldsValue = await validate<LoginParamsType>();
         isLogin.value = true;
         const res: boolean = await store.dispatch("user/login", fieldsValue);
+
         if (res === true) {
-          message.success(t("page.user.login.form.login-success"));
           const { redirect, ...query } = currentRoute.value.query;
           router.replace({
             path: (redirect as string) || "/",
@@ -303,10 +311,9 @@ export default defineComponent({
   }
 }
 .user_ohter_login {
-  color: #1d1d1d;
+  color: $font-color-fix;
   margin-top: 15px;
   .user_ohter_login_item {
-    font-size: 24px;
     margin-left: 12px;
     cursor: pointer;
   }
@@ -318,16 +325,17 @@ export default defineComponent({
   background-color: rgba($color: #dfdfdf, $alpha: 0.8);
   .user_login_loading_icon {
     margin-bottom: 24px;
+    @include rotate360();
   }
 }
 .user_login_fail {
   margin-top: 37px;
-  font-size: $font-size-18;
+  font-size: 18px;
   font-weight: bold;
   line-height: 24px;
   .user_login_fail_name {
     margin: 51px 0 9px;
-    font-size: $font-size-22;
+    font-size: 22px;
     font-weight: 500;
   }
   .submit {

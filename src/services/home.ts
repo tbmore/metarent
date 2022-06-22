@@ -1,6 +1,7 @@
 import request from '@/utils/request';
 import { TableListQueryParams } from '../store/modules/home/data';
 
+//     headers: { 'Authorization': process.env.NODE_ENV == 'development' && localToken ? localToken : '' }
 export async function dailynewArticles(): Promise<any> {
   return request({
       url: '/home/articles/dailynew',

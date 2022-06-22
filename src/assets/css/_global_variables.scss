@@ -3,18 +3,20 @@ $font-family-letter: DIN-Bold, $font-family;
 $primary-color: #0084FF; // 主色
 $minor-color-main: #FF7700; // 辅助色1
 $minor-color-minor: #00B38A; // 辅助色2
+$minor-color-last: #FF1010; // 辅助色3
 $background-color-main: #E8EBFF; // 背景色1
 $background-color-minor: #EAEAEA; // 背景色2 
 
-$font-color-main: #282D32; // 正文本
+$font-color-main: #003669; // 正文本
+$font-color-fix: #1D1D1D; // 2
 $font-color-minor: #B2B4CA; // 描述文本
 $font-color-nomal: #CBCBCB; // 描述文本2
 
+
 $font-size-base: 14px; // 主字号
-$font-size-22:22px;
-$font-size-18:18px;
-$font-size-16:16px;
-$font-size-12:12px;
+
+// 头部高度
+$headerHeight: 60px;
 
 $default-width: 1440px; // 默认最小宽度
 
@@ -31,8 +33,6 @@ $menu-dark-highlight-color:red;
 $mainBgColor: #f0f3f4;
 // 左边宽度
 $leftSideBarWidth: 200px;
-// 头部高度
-$headerHeight: 50px;
 // 头部下方面包屑高度
 $headerBreadcrumbHeight: 34px;
 // 头部面包屑下tab导航高度

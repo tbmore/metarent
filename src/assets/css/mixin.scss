@@ -2,20 +2,32 @@
     $thumb-shadow: hsla(0, 0%, 100%, .05),
     $track-background: hsla(0, 0%, 100%, .15),
     $track-shadow: rgba(37, 37, 37, .05)) {
+
+    // 滚动条整体部分，其中的属性有width,height,background,border（就和一个块级元素一样）等
     ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
     }
 
+    // ::-webkit-scrollbar-button
+    // 滚动条两端的按钮。可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果.
+
+    // 滚动条上的滚动滑块.
+    // 滚动条里面可以拖动的那部分,即滚动条。
     ::-webkit-scrollbar-thumb {
         background: $thumb-background;
-        border-radius: 3px;
+        border-radius: 4px;
         box-shadow: inset 0 0 5px $thumb-shadow;
+
+        &:hover {
+            background: #1D1D1D;
+        }
     }
 
+    // 外层轨道。可以用display:none让其不显示，也可以添加背景图片，颜色改变显示效果。
     ::-webkit-scrollbar-track {
         background: $track-background;
-        border-radius: 3px;
+        border-radius: 4px;
         box-shadow: inset 0 0 5px rgba(37, 37, 37, .05);
     }
 }
@@ -24,4 +36,39 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@mixin mul_ellipsis($linecount) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: $linecount;
+    -webkit-box-orient: vertical;
+}
+
+@mixin rotate360() {
+    animation: mymove 3s infinite linear;
+    -webkit-animation: mymove 3s infinite linear;
+
+    /*Safari and Chrome*/
+    @keyframes mymove {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /*Safari and Chrome*/
+    @-webkit-keyframes mymove {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
 }

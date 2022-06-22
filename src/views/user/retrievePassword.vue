@@ -34,7 +34,7 @@
       {{t('next.step')}}
     </a-button>
   </a-row>
-  <a-row class="main set_username flex_dir_c w100 h100"
+  <a-row class="set_username main flex_dir_c w100 h100"
          align="middle"
          justify="space-between"
          v-if="retrievePasswordPage=='email'">
@@ -43,18 +43,18 @@
             layout="vertical">
       <a-row class="retrieve_titles w100"
              justify="center">{{t('page.user.retrievepassword.title')}}</a-row>
-      <a-form-item :label="t('page.user.login.form.username.title')"
-                   v-bind="validateInfos.username">
-        <a-auto-complete :options="usernameoptions"
+      <a-form-item :label="t('page.user.login.form.email.title')"
+                   v-bind="validateInfos.email">
+        <a-auto-complete :options="emailOptions"
                          @search="handleSearch"
                          @select="handleSelect">
-          <a-input v-model:value="modelRef.username"
-                   :placeholder="t('page.user.login.form-item-username')"
+          <a-input v-model:value="modelRef.email"
+                   :placeholder="t('page.user.retrievepassword.email')"
                    size="large"
                    class="user_input"
-                   @blur="validate('username')"
-                   @keyup.enter="handleSubmit('username',$event)"
-                   @change="setBtnStatus('username')">
+                   @blur="validate('email')"
+                   @keyup.enter="handleSubmit('email',$event)"
+                   @change="setBtnStatus('email')">
           </a-input>
           <template #option="{ value: val }">
             {{ val.split('@')[0] }} @
@@ -66,10 +66,9 @@
     </a-form>
     <a-button type="primary"
               class="submit user_input"
-              @click="handleSubmit('username',$event)"
-              :loading="submitLoading"
+              @click="handleSubmit('email',$event)"
               size="large"
-              :disabled="btnUsernameStatus">
+              :disabled="btnEmailStatus">
       {{t('next.step')}}
     </a-button>
   </a-row>
@@ -93,11 +92,12 @@
                        :maxlength="1"
                        min="0"
                        max="9"
-                       :ref="`verify${i}`"
-                       @keydown="verifyKeydown"
-                       @keyup="verifyInput">
+                       :ref="`verify${idx}`"
+                       @keydown="verifyKeydown(idx,$event)"
+                       @keyup="verifyInput(idx,$event)">
               </a-input>
             </a-form-item>
+
           </a-col>
         </template>
       </a-row>
@@ -105,6 +105,7 @@
     <a-row class="text_align_left resend_code"
            align="middle">
       <iconpark-icon class="user_ohter_login_item"
+                     size="24"
                      name="check-one-5ceo7la5"></iconpark-icon>Resend Code
       <a-statistic-countdown :value="deadline"
                              format="s"
@@ -117,9 +118,8 @@
     <a-button type="primary"
               class="submit user_input"
               @click="handleSubmit('verify',$event)"
-              :loading="submitLoading"
               size="large"
-              :disabled="btnverifyStatus">
+              :disabled="btnVerifyStatus">
       {{t('next.step')}}
     </a-button>
   </a-row>
@@ -157,6 +157,7 @@ import ALink from "@/components/ALink/index.vue";
 
 import loginLoading from "@/assets/images/user/login_loading.png";
 import loginFailed from "@/assets/images/user/login_failed.png";
+import { email } from "@/config/data";
 
 interface UserLoginSetupData {
   t: (key: string | number) => string;
@@ -168,9 +169,8 @@ interface UserLoginSetupData {
   loginStatus: ComputedRef<"error" | "ok" | undefined>;
   loginLoading: string;
   loginFailed: string;
-  isLogin: Ref<boolean>;
   isLoginError: Ref<boolean>;
-  usernameoptions: Ref<{ value: string }[]>;
+  emailOptions: Ref<{ value: string }[]>;
   handleSearch: (e: string) => void;
   handleSelect: (e: string) => void;
   retrievePasswordPage: ComputedRef<"email" | "verify" | "password">;
@@ -179,8 +179,8 @@ interface UserLoginSetupData {
   verifyKeydown: (e: MouseEvent) => void;
   backEvent: () => void;
   btnPasswordStatus: Ref<boolean>;
-  btnUsernameStatus: Ref<boolean>;
-  btnverifyStatus: Ref<boolean>;
+  btnEmailStatus: Ref<boolean>;
+  btnVerifyStatus: Ref<boolean>;
   setBtnStatus: (key: string) => void;
   validate: (key: string) => void;
   onFinish: () => void;
@@ -193,89 +193,106 @@ export default defineComponent({
     UnlockOutlined,
     ALink,
   },
-  setup(): UserLoginSetupData {
-    const isLogin = ref<boolean>(false);
+  //   setup(): UserLoginSetupData {
+  setup() {
     const isLoginError = ref<boolean>(false);
 
     const btnPasswordStatus = ref<boolean>(true);
-    const btnUsernameStatus = ref<boolean>(true);
-    const btnverifyStatus = ref<boolean>(true);
+    const btnEmailStatus = ref<boolean>(true);
+    const btnVerifyStatus = ref<boolean>(true);
 
     const router = useRouter();
     const { currentRoute, push } = router;
     const store = useStore<{ user: UserLoginStateType }>();
     const { t } = useI18n();
     const deadline = ref<number>(Date.now() + 1000 * 60);
+    const verify0: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify1: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify2: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const verify3: Ref<HTMLInputElement | null> = ref(null); // = ref(null);
+    const evidence = ref("");
 
     // 用户名自动填充
-    const usernameoptions = ref<{ value: string }[]>([]);
+    const emailOptions = ref<{ value: string }[]>([]);
     const handleSearch = async (val: string) => {
-      console.log(usernameoptions.value, val, "====");
       let res: { value: string }[];
       if (!val || val.indexOf("@") >= 0) {
         res = [];
       } else {
-        res = ["gmail.com", "163.com", "qq.com"].map((domain) => ({
+        res = email.map((domain) => ({
           value: `${val}@${domain}`,
         }));
       }
-      usernameoptions.value = res;
+      emailOptions.value = res;
     };
 
     const handleSelect = async (val: string) => {
-      modelRef.username = val;
+      modelRef.email = val;
+      validate("email").catch((err) => {
+        btnEmailStatus.value = err.errorFields.length ? true : false;
+      });
       //   validate("username");
     };
 
-    const verifyKeydown = (event) => {
-      //   console.log(event, "====");
-      //   const value = event.key
-      //   console.log(value)
-      //   if(!/[0-9]/.test(value)){
-      //     //   event.stopPropagation()
-      //     //   event.preventDefault()
-      //   }
+    const verifyKeydown = (idx: string | number, event) => {
+      const value = event.key,
+        keyCode = event.keyCode;
+      if (
+        !/[0-9]/.test(value) &&
+        keyCode != 13 &&
+        keyCode != 8 &&
+        keyCode != 46
+      ) {
+        event.preventDefault();
+      }
+    };
+
+    const verifyInput = (idx: number, event: { key: any }) => {
+      const value = event.key;
+      if (/[0-9]/.test(value)) {
+        // console.log(verify1.value?.[0].value, verify1);
+        // verify3.value?.[0].focus()
+        const arr = [verify0, verify1, verify2, verify3];
+        if (idx < 3) {
+          arr[idx + 1].value?.[0].focus();
+        }
+      }
+      btnVerifyStatus.value =
+        modelRef.verify?.find((v) => v == "") == undefined ? false : true;
     };
     const backEvent = () => {
       console.log(retrievePasswordPage.value);
       switch (retrievePasswordPage.value) {
         case "email":
-          store.dispatch("user/retrievePasswordPage", "verify");
+          //   store.dispatch("user/setRetrievePasswordPage", "verify");
           break;
         case "password":
-          push({ path: "/user/login" }); //push({ path: "./login" });
-          store.dispatch("user/retrievePasswordPage", "username");
+          store.dispatch("user/setRetrievePasswordPage", "verify");
           break;
         case "verify":
-          store.dispatch("user/retrievePasswordPage", "email");
+          store.dispatch("user/setRetrievePasswordPage", "email");
           break;
       }
-    };
-    const verifyInput = (event) => {
-      console.log(event);
-      console.log(modelRef.verify, "verify");
     };
 
     // 表单值
     const modelRef = reactive<LoginParamsType>({
       email: "",
       password: "",
-      verify: [],
+      verify: ["", "", "", ""],
     });
 
     // 表单验证
-    const validateUsername = async (_rule: Rule, value: string) => {
+    const validateEmail = async (_rule: Rule, value: string) => {
       if (value === "") {
-        return Promise.reject("page.user.login.form-item-username.required");
+        return Promise.reject("page.user.login.form-item-email.required");
       } else {
         const reg = new RegExp(
           /^([a-zA-Z\d][\w-]{2,})@(\w{2,})\.([a-z]{2,})(\.[a-z]{2,})?$/
         );
-        console.log(value, reg.test(value));
         if (!reg.test(value)) {
-          return Promise.reject("page.user.login.form-item-username.required");
+          return Promise.reject("page.user.login.form-item-email.required");
         }
-        console.log(123);
         return Promise.resolve();
       }
     };
@@ -290,11 +307,24 @@ export default defineComponent({
       }
     };
 
+    const validateVerify = async (_rule: Rule, value: any) => {
+      const res: any = await store.dispatch("user/verifyToken", {
+        email: modelRef.email,
+        code: value.join(""),
+        type: "5",
+      });
+      if (res && res.code == 0) {
+        evidence.value = res.data;
+        return Promise.resolve();
+      } else {
+        return Promise.reject();
+      }
+    };
     //  表单验证规则
     const rulesRef = reactive({
-      username: [
+      email: [
         {
-          validator: validateUsername, // 自定义校验
+          validator: validateEmail, // 自定义校验
           trigger: "blur",
         },
       ],
@@ -306,7 +336,7 @@ export default defineComponent({
       ],
       verify: [
         {
-          message: "",
+          validator: validateVerify,
           trigger: "blur",
         },
       ],
@@ -321,13 +351,16 @@ export default defineComponent({
       const { email, password, verify } = modelRef;
       switch (key as any) {
         case "email":
-          btnUsernameStatus.value = email.length ? false : true;
+          validate("email").catch((err) => {
+            btnEmailStatus.value = err.errorFields.length ? true : false;
+          });
           break;
         case "password":
+            console.log(1)
           btnPasswordStatus.value = password.length ? false : true;
           break;
         case "verify":
-          btnverifyStatus.value = verify?.find((item) => !item) ? false : true;
+          btnVerifyStatus.value = verify?.find((item) => !item) ? true : false;
           break;
       }
     };
@@ -338,44 +371,42 @@ export default defineComponent({
     const submitLoading = ref<boolean>(false);
     // 登录
     const handleSubmit = async (key: string, e: MouseEvent) => {
-      console.log(key, e, 99);
       e.preventDefault();
+      const { email, password, verify } = modelRef;
+      const fieldsValue = await validate(key);
       switch (retrievePasswordPage.value) {
         case "email":
-          store.dispatch("user/retrievePasswordPage", "verify");
+          await store.dispatch("user/sendEmail", {
+            email: fieldsValue.email,
+            type: "5",
+          });
+          store.dispatch("user/setRetrievePasswordPage", "verify");
           break;
         case "password":
-          push({ path: "/user/login" }); //push({ path: "./login" });
-          store.dispatch("user/retrievePasswordPage", "username");
+          submitLoading.value = true;
+          const res: any = await store.dispatch("user/resetPassword", {
+            email: email,
+            evidence: evidence.value,
+            password: password,
+          });
+          console.log(res)
+          if (res && res.code == 0) {
+            //   const { redirect, ...query } = currentRoute.value.query;
+            router.replace({
+              path: "/user/login",
+              // query: {
+              //   ...query,
+              // },
+            });
+          }
+          submitLoading.value = false;
           break;
         case "verify":
-          store.dispatch("user/retrievePasswordPage", "email");
+          if (fieldsValue) {
+            store.dispatch("user/setRetrievePasswordPage", "password");
+          }
           break;
       }
-
-      submitLoading.value = true;
-      return;
-      try {
-        const fieldsValue = await validate<LoginParamsType>();
-        isLogin.value = true;
-        console.log(fieldsValue);
-        const res: boolean = await store.dispatch("user/login", fieldsValue);
-        if (res === true) {
-          message.success(t("page.user.login.form.login-success"));
-          const { redirect, ...query } = currentRoute.value.query;
-          router.replace({
-            path: (redirect as string) || "/",
-            query: {
-              ...query,
-            },
-          });
-        }
-        isLogin.value = false;
-      } catch (error) {
-        console.log("error", error);
-        isLogin.value = false;
-      }
-      submitLoading.value = false;
     };
 
     // 登录状态
@@ -389,7 +420,6 @@ export default defineComponent({
 
     // 重置 validateInfos
     const validateInfosNew = useI18nAntdFormVaildateInfos(validateInfos);
-
     return {
       t,
       resetFields,
@@ -400,9 +430,8 @@ export default defineComponent({
       loginStatus,
       loginLoading,
       loginFailed,
-      isLogin,
       isLoginError,
-      usernameoptions,
+      emailOptions,
       handleSearch,
       handleSelect,
       retrievePasswordPage,
@@ -411,11 +440,15 @@ export default defineComponent({
       verifyKeydown,
       backEvent,
       btnPasswordStatus,
-      btnUsernameStatus,
-      btnverifyStatus,
+      btnEmailStatus,
+      btnVerifyStatus,
       setBtnStatus,
       validate,
       onFinish,
+      verify0,
+      verify1,
+      verify2,
+      verify3,
     };
   },
 });
@@ -433,7 +466,7 @@ export default defineComponent({
 .retrieve_titles {
   line-height: 24px;
   font-weight: bold;
-  font-size: $font-size-22;
+  font-size: 22px;
 }
 .verify {
   margin-top: 3px;
@@ -478,21 +511,20 @@ export default defineComponent({
     }
   }
   .resend_code {
-    font-size: $font-size-16;
+    font-size: 16px;
     color: $font-color-nomal;
     line-height: 1.5;
     margin-top: 6px;
     :deep(.ant-statistic-content) {
-      font-size: $font-size-16;
+      font-size: 16px;
       line-height: 1;
       padding-left: 10px;
       color: $font-color-nomal;
     }
     :deep(.ant-statistic-content-value) {
-      font-size: $font-size-16;
+      font-size: 16px;
     }
     .user_ohter_login_item {
-      font-size: 24px;
       margin-left: 12px;
       margin-right: 5px;
     }
